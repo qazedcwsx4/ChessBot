@@ -12,6 +12,9 @@ use tokio::task::JoinHandle;
 use std::sync::mpsc::{self, Sender, Receiver};
 use tokio::runtime::Runtime;
 use tokio::time::Duration;
+use crate::stream::platform_event::Event;
+
+mod platform_event;
 
 const URL: &str = "https://lichess.org/api";
 const ENDPOINT: &str = "stream/event";
@@ -55,6 +58,10 @@ async fn events(tx: Sender<String>) -> std::result::Result<(), Box<dyn std::erro
 
         if slice != EMPTY_MESSAGE {
             tx.send(slice.to_string());
+
+            let xd: Event = serde_json::from_str(slice).unwrap();
+
+            println!("{:#?}", xd);
         }
     }
     println!("Stream ended");
