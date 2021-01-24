@@ -44,7 +44,6 @@ pub struct Player {
     name: String,
     title: Option<String>,
     rating: i32,
-    provisional: bool,
     online: bool,
 }
 
@@ -57,13 +56,15 @@ pub struct Variant {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "type")]
 #[serde(rename_all = "camelCase")]
-pub struct TimeControl {
-    #[serde(rename = "type")]
-    control_type: String,
-    limit: i32,
-    increment: i32,
-    show: String,
+pub enum TimeControl {
+    Unlimited {},
+    Clock {
+        limit: i32,
+        increment: i32,
+        show: String,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
