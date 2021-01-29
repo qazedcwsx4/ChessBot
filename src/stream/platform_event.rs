@@ -24,35 +24,35 @@ pub enum Event {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Challenge {
-    id: String,
-    url: String,
-    status: String,
-    challenger: Player,
-    dest_user: Player,
-    variant: Variant,
-    rated: bool,
-    speed: String,
-    time_control: TimeControl,
-    color: String,
-    perf: Perf,
+    pub id: String,
+    pub url: String,
+    pub status: String,
+    pub challenger: Player,
+    pub dest_user: Player,
+    pub variant: Variant,
+    pub rated: bool,
+    pub speed: String,
+    pub time_control: TimeControl,
+    pub color: String,
+    pub perf: Perf,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Player {
-    id: String,
-    name: String,
-    title: Option<String>,
-    rating: i32,
-    online: bool,
+    pub id: String,
+    pub name: String,
+    pub title: Option<String>,
+    pub rating: i32,
+    pub online: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Variant {
-    key: String,
-    name: String,
-    short: Option<String>,
+    pub key: String,
+    pub name: String,
+    pub short: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -70,12 +70,12 @@ pub enum TimeControl {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Perf {
-    icon: String,
-    name: String,
+    pub icon: String,
+    pub name: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Game {
-    id: String,
+    pub id: String,
 }

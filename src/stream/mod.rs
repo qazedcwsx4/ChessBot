@@ -6,11 +6,14 @@ use crate::stream::platform_event::Event;
 use hyper::client::HttpConnector;
 use hyper::client::connect::Connect;
 use std::sync::Arc;
+use std::io::Error;
+use tokio::io::ErrorKind;
 
-mod platform_event;
+pub mod platform_event;
 
 const URL: &str = "HTTPS://lichess.org/api";
 const EVENT_ENDPOINT: &str = "stream/event";
+const CHALLENGE_ENDPOINT: &str = "challenge";
 const BEARER_TOKEN: &str = "eOcwgviIZY7b9ZU3";
 const EMPTY_MESSAGE: &str = "\n";
 
@@ -27,24 +30,38 @@ impl Lichess {
         Lichess { client: Arc::new(client) }
     }
 
-    pub async fn get_incoming_event_stream(&self) -> (JoinHandle<()>, Receiver<String>) {
+    pub async fn get_incoming_event_stream(&self) -> (JoinHandle<()>, Receiver<Event>) {
         Lichess::get_event_stream(Arc::clone(&self.client), EVENT_ENDPOINT).await
+    }
+
+    pub async fn accept_challenge(&self, challenge: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        let request = Request::post(format!("{}/{}/{}/{}", URL, CHALLENGE_ENDPOINT, challenge, "accept"))
+            .header("Authorization", format!("Bearer {}", BEARER_TOKEN))
+            .body(Body::from(""))?;
+
+        let mut resp = self.client.request(request).await?;
+
+        if !resp.status().is_success() {
+            return Err(Box::new(Error::new(ErrorKind::Other, resp.status().as_str())))
+        }
+
+        Ok(())
     }
 }
 
 impl Lichess {
-    async fn get_event_stream(client: Arc<SecureClient>, endpoint: &'static str) -> (JoinHandle<()>, Receiver<String>) {
-        let (tx, rx): (Sender<String>, Receiver<String>) = mpsc::channel();
+    async fn get_event_stream(client: Arc<SecureClient>, endpoint: &'static str) -> (JoinHandle<()>, Receiver<Event>) {
+        let (tx, rx): (Sender<Event>, Receiver<Event>) = mpsc::channel();
         let handle = tokio::spawn(Lichess::start_event_thread(client, tx, endpoint));
 
         (handle, rx)
     }
 
-    async fn start_event_thread(client: Arc<SecureClient>, tx: Sender<String>, endpoint: &str) {
+    async fn start_event_thread(client: Arc<SecureClient>, tx: Sender<Event>, endpoint: &str) {
         if let Err(e) = Lichess::events(client, tx, endpoint).await { panic!(e.to_string()) }
     }
 
-    async fn events(client: Arc<SecureClient>, tx: Sender<String>, endpoint: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
+    async fn events(client: Arc<SecureClient>, tx: Sender<Event>, endpoint: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
         println!("Starting the listener");
         let request = Request::get(format!("{}/{}", URL, endpoint))
             .header("Authorization", format!("Bearer {}", BEARER_TOKEN))
@@ -57,11 +74,10 @@ impl Lichess {
             let slice = std::str::from_utf8(chunk.as_ref())?;
 
             if slice != EMPTY_MESSAGE {
-                tx.send(slice.to_string())?;
+                println!("{:#?}", slice);
+                let json: Event = serde_json::from_str(slice)?;
 
-                let xd: Event = serde_json::from_str(slice)?;
-
-                println!("{:#?}", xd);
+                tx.send(json)?;
             }
         }
         println!("Stream ended");
