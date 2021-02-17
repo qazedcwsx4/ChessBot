@@ -22,7 +22,7 @@ const URL: &str = "HTTPS://lichess.org/api";
 const EVENT_ENDPOINT: &str = "stream/event";
 const GAME_STREAM_ENDPOINT: &str = "bot/game/stream";
 const CHALLENGE_ENDPOINT: &str = "challenge";
-const BEARER_TOKEN: &str = "eOcwgviIZY7b9ZU3";
+const BEARER_TOKEN: &str = "";  // placeholder before implementing passing token by envvars. Previous token was invalidated.
 const EMPTY_MESSAGE: &str = "\n";
 
 type SecureClient = Client<HttpsConnector<HttpConnector>, hyper::Body>;
