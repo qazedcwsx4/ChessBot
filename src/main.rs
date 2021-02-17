@@ -2,6 +2,11 @@ use crate::stream::Lichess;
 use crate::stream::platform_event::PlatformEvent;
 use crate::stream::platform_event::PlatformEvent::{Challenge, GameStart};
 use std::borrow::Borrow;
+use std::thread::sleep;
+use tokio::time::Duration;
+use std::io;
+use std::io::Read;
+use crate::stream::game_event::GameEvent;
 
 mod stream;
 
@@ -32,10 +37,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 async fn enter_game(lichess : &Lichess, game: &str) -> Result<(), Box<dyn std::error::Error>> {
     let (handle, rx) = lichess.get_game_event_steam(game).await;
+    sleep(Duration::from_millis(100));
+    let result = lichess.make_move(game, "h2h3").await?;
+    loop {
+        for received in rx.try_iter() {
+            println!("Got: {:#?}", received);
+            match received {
+                GameEvent::GameFull { .. } => {}
+                GameEvent::GameState { state } => {}
+                GameEvent::ChatLine { .. } => {}
+            }
+        }
 
-    for received in rx {
-        println!("Got: {:#?}", received);
+        sleep(Duration::from_millis(100))
     }
+
+
+    println!("Got");
 
     handle.await?;
     Ok(())

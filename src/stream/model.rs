@@ -63,12 +63,12 @@ pub struct Game {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct State {
-    moves: String,
-    wtime: i32,
-    btime: i32,
-    winc: i32,
-    binc: i32,
-    wdraw: bool,
-    bdraw: bool,
-    status: String,
+    pub moves: String,
+    pub wtime: i32,
+    pub btime: i32,
+    pub winc: i32,
+    pub binc: i32,
+    pub wdraw: bool,
+    pub bdraw: bool,
+    pub status: String,
 }

@@ -20,7 +20,7 @@ pub mod model;
 
 const URL: &str = "HTTPS://lichess.org/api";
 const EVENT_ENDPOINT: &str = "stream/event";
-const GAME_ENDPOINT: &str = "bot/game/stream";
+const GAME_STREAM_ENDPOINT: &str = "bot/game/stream";
 const CHALLENGE_ENDPOINT: &str = "challenge";
 const BEARER_TOKEN: &str = "eOcwgviIZY7b9ZU3";
 const EMPTY_MESSAGE: &str = "\n";
@@ -42,12 +42,28 @@ impl Lichess {
         Lichess::get_event_stream(Arc::clone(&self.client), format!("{}", EVENT_ENDPOINT)).await
     }
 
-    pub async fn get_game_event_steam(&self, game: &str) -> (JoinHandle<()>, Receiver<GameEvent>){
-        Lichess::get_event_stream(Arc::clone(&self.client), format!("{}/{}", GAME_ENDPOINT, game)).await
+    pub async fn get_game_event_steam(&self, game: &str) -> (JoinHandle<()>, Receiver<GameEvent>) {
+        Lichess::get_event_stream(Arc::clone(&self.client), format!("{}/{}", GAME_STREAM_ENDPOINT, game)).await
     }
 
     pub async fn accept_challenge(&self, challenge: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
         let request = Request::post(format!("{}/{}/{}/{}", URL, CHALLENGE_ENDPOINT, challenge, "accept"))
+            .header("Authorization", format!("Bearer {}", BEARER_TOKEN))
+            .body(Body::from(""))?;
+
+        let mut resp = self.client.request(request).await?;
+
+        if !resp.status().is_success() {
+            return Err(Box::new(Error::new(ErrorKind::Other, resp.status().as_str())));
+        }
+
+        Ok(())
+    }
+
+    pub async fn make_move(&self, game: &str, game_move: &str) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        println!("{}/bot/game/{}/move/{}", URL, game, game_move);
+
+        let request = Request::post(format!("{}/bot/game/{}/move/{}", URL, game, game_move))
             .header("Authorization", format!("Bearer {}", BEARER_TOKEN))
             .body(Body::from(""))?;
 
