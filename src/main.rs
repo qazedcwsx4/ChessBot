@@ -4,7 +4,7 @@ use crate::stream::platform_event::PlatformEvent::{Challenge, GameStart};
 use std::borrow::Borrow;
 use std::thread::sleep;
 use tokio::time::Duration;
-use std::io;
+use std::{io, env};
 use std::io::Read;
 use crate::stream::game_event::GameEvent;
 
@@ -12,7 +12,9 @@ mod stream;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let lichess = Lichess::new();
+    let token = env::var("LICHESS_TOKEN")?;
+
+    let lichess = Lichess::new(token);
     let (handle, rx) = lichess.get_incoming_event_stream().await;
 
     for received in rx {
