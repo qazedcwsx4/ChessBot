@@ -3,17 +3,14 @@ use std::sync::Arc;
 use std::sync::mpsc::{self, Receiver, Sender};
 
 use hyper::{Body, body::HttpBody as _, Client, Request};
-use hyper::client::connect::Connect;
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
+use serde::de::DeserializeOwned;
 use tokio::io::ErrorKind;
 use tokio::task::JoinHandle;
 
-use crate::stream::platform_event::PlatformEvent;
 use crate::stream::game_event::GameEvent;
-use serde::Deserialize;
-use serde::de::DeserializeOwned;
-use std::borrow::Borrow;
+use crate::stream::platform_event::PlatformEvent;
 
 pub mod platform_event;
 pub mod game_event;
@@ -55,7 +52,7 @@ impl Lichess {
             .header("Authorization", format!("Bearer {}", self.token))
             .body(Body::from(""))?;
 
-        let mut resp = self.client.request(request).await?;
+        let resp = self.client.request(request).await?;
 
         if !resp.status().is_success() {
             return Err(Box::new(Error::new(ErrorKind::Other, resp.status().as_str())));
@@ -71,7 +68,7 @@ impl Lichess {
             .header("Authorization", format!("Bearer {}", self.token))
             .body(Body::from(""))?;
 
-        let mut resp = self.client.request(request).await?;
+        let resp = self.client.request(request).await?;
 
         if !resp.status().is_success() {
             return Err(Box::new(Error::new(ErrorKind::Other, resp.status().as_str())));

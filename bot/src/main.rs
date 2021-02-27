@@ -1,14 +1,13 @@
-use crate::stream::Lichess;
-use crate::stream::platform_event::PlatformEvent;
-use crate::stream::platform_event::PlatformEvent::{Challenge, GameStart};
+use std::{env};
 use std::borrow::Borrow;
 use std::thread::sleep;
 use tokio::time::Duration;
-use std::{io, env};
-use std::io::Read;
-use crate::stream::game_event::GameEvent;
 
-mod stream;
+use lichess_api::stream::game_event::GameEvent;
+use lichess_api::stream::Lichess;
+use lichess_api::stream::platform_event::PlatformEvent::{Challenge, GameStart};
+
+extern crate lichess_api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -38,25 +37,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 async fn enter_game(lichess : &Lichess, game: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let (handle, rx) = lichess.get_game_event_steam(game).await;
+    let (_handle, rx) = lichess.get_game_event_steam(game).await;
     sleep(Duration::from_millis(100));
-    let result = lichess.make_move(game, "h2h3").await?;
+    //let result = lichess.make_move(game, "h2h3").await?;
     loop {
         for received in rx.try_iter() {
             println!("Got: {:#?}", received);
             match received {
                 GameEvent::GameFull { .. } => {}
-                GameEvent::GameState { state } => {}
+                GameEvent::GameState { .. } => {}
                 GameEvent::ChatLine { .. } => {}
             }
         }
 
         sleep(Duration::from_millis(100))
     }
-
-
-    println!("Got");
-
-    handle.await?;
-    Ok(())
+    //
+    // println!("Got");
+    // _handle.await?;
+    // Ok(())
 }
