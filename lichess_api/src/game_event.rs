@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::model::{Variant, Perf, Player, State};
+
+use crate::model::{Perf, Player, State, Variant};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]
@@ -8,7 +9,6 @@ pub enum GameEvent {
     GameFull {
         id: String,
         variant: Variant,
-        clock: Option<String>,
         speed: String,
         perf: Perf,
         rated: bool,

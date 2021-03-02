@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use crate::model::{Game, Challenge};
+
+use crate::model::{Challenge, Game};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]
