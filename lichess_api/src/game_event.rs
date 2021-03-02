@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::stream::model::{Variant, Perf, Player, State};
+use crate::model::{Variant, Perf, Player, State};
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type")]

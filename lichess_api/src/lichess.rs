@@ -8,13 +8,8 @@ use hyper_tls::HttpsConnector;
 use serde::de::DeserializeOwned;
 use tokio::io::ErrorKind;
 use tokio::task::JoinHandle;
-
-use crate::stream::game_event::GameEvent;
-use crate::stream::platform_event::PlatformEvent;
-
-pub mod platform_event;
-pub mod game_event;
-pub mod model;
+use crate::platform_event::PlatformEvent;
+use crate::game_event::GameEvent;
 
 const URL: &str = "HTTPS://lichess.org/api";
 const EVENT_ENDPOINT: &str = "stream/event";

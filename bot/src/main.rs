@@ -3,9 +3,9 @@ use std::borrow::Borrow;
 use std::thread::sleep;
 use tokio::time::Duration;
 
-use lichess_api::stream::game_event::GameEvent;
-use lichess_api::stream::Lichess;
-use lichess_api::stream::platform_event::PlatformEvent::{Challenge, GameStart};
+use lichess_api::game_event::GameEvent;
+use lichess_api::lichess::Lichess;
+use lichess_api::platform_event::PlatformEvent::*;
 
 extern crate lichess_api;
 
