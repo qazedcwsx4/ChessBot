@@ -9,9 +9,18 @@ use lichess_api::game::Game;
 use lichess_api::game_event::GameEvent;
 use lichess_api::lichess::Lichess;
 use lichess_api::platform_event::PlatformEvent::*;
+use crate::board::Board;
+use colored::Colorize;
+
+mod board;
+mod piece;
+mod game_move;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    println!("{:#?}", Board::new());
+    println!("{}", "xd".red());
+
     let token = env::var("LICHESS_TOKEN")?;
 
     let lichess = Lichess::new(token);
